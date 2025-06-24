@@ -16,18 +16,22 @@ export interface EngineerUtilization {
 }
 
 interface EngineerState {
-  utilizationData: EngineerUtilization[]
-  loading: boolean
-  setUtilizationData: (data: EngineerUtilization[]) => void
-  setLoading: (value: boolean) => void
+  utilizationData: EngineerUtilization[];
+  masterUtilizationData: EngineerUtilization[]; // To hold the unfiltered list
+  loading: boolean;
+  setUtilizationData: (data: EngineerUtilization[]) => void;
+  setMasterUtilizationData: (data: EngineerUtilization[]) => void; // Setter for the master list
+  setLoading: (value: boolean) => void;
 }
 
 export const useEngineerStore = create<EngineerState>((set) => ({
   utilizationData: [],
+  masterUtilizationData: [],
   loading: false,
   setUtilizationData: (data) => set({ utilizationData: data }),
+  setMasterUtilizationData: (data) => set({ masterUtilizationData: data }),
   setLoading: (value) => set({ loading: value }),
-}))
+}));
 
 interface Engineer {
   _id: string

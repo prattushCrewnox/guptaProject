@@ -8,6 +8,13 @@ export const fetchAllEngineers = async (token: string) => {
   })
   return res.data
 }
+export const getEngineerCapacity = async (id: string, token: string) => {
+  const res = await axios.get(`${baseURL}/engineer/${id}/capacity`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
 export const updateEngineerProfile = async (
   id: string,
   data: { skills?: string[]; seniority?: string },

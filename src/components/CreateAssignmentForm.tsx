@@ -1,8 +1,10 @@
+import React, { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useAuthStore } from "../store/authStore"
 import { useEngineerListStore } from "../store/engineerStore"
 import { useProjectStore } from "../store/projectStore"
 import { createAssignment } from "../api/assignment"
+import { fetchAllEngineers } from "../api/engineer"
 
 interface FormData {
   engineerId: string
@@ -18,6 +20,16 @@ export const CreateAssignmentForm = () => {
   const token = useAuthStore((s) => s.token)
   const engineers = useEngineerListStore((s) => s.engineers)
   const projects = useProjectStore((s) => s.projects)
+  const setEngineers = useEngineerListStore((s) => s.setEngineers)
+
+  useEffect(() => {
+    const fetchEngineers = async () => {
+      if (!token) return
+      const engs = await fetchAllEngineers(token)
+      setEngineers(engs.map(e => ({ _id: e._id, name: e.name })))
+    }
+    fetchEngineers()
+  }, [token, setEngineers])
 
   const onSubmit = async (data: FormData) => {
     try {

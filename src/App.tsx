@@ -4,6 +4,7 @@ import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import ManagerDashboard from "./pages/ManagerDashboard";
+import { LogoutButton } from "./components/LogoutButton";
 import EngineerDashboard from "./pages/EngineerDashboard";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import { Layout } from "./components/Layout";
@@ -26,37 +27,39 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
-        <Route path="/signup" element={!user ? <SignupPage /> : <Navigate to="/dashboard" />} />
+      <div className="relative">
+        {user && <LogoutButton />}
+        <Routes>
+          <Route path="/" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
+          <Route path="/signup" element={!user ? <SignupPage /> : <Navigate to="/dashboard" />} />
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Layout>
-                {user?.role === "manager" ? <ManagerDashboard /> : <EngineerDashboard />}
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  {user?.role === "manager" ? <ManagerDashboard /> : <EngineerDashboard />}
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/analytics"
-          element={
-            <ProtectedRoute role="manager">
-              <Layout>
-                <AnalyticsDashboard />
-              </Layout>
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute role="manager">
+                <Layout>
+                  <AnalyticsDashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route path="*" element={<div className="p-6 text-red-500 text-xl">404 - Page Not Found</div>} />
-      </Routes>
+          <Route path="*" element={<div className="p-6 text-red-500 text-xl">404 - Page Not Found</div>} />
+        </Routes>
+      </div>
     </Router>
   );
 }
 
 export default App;
-

@@ -25,8 +25,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-800 text-white p-6 space-y-4 hidden md:block">
-        <h2 className="text-xl font-bold mb-6">ERM System</h2>
+      {/* <aside className="w-64 bg-gray-800 text-white p-6 space-y-4 hidden md:block"> */}
+        {/* <h2 className="text-xl font-bold mb-6">ERM System</h2>
 
         {navLinks.map((link) => (
           <Link
@@ -46,10 +46,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         >
           Logout
         </button>
-      </aside>
+      </aside> */}
 
       {/* Content */}
-      <main className="flex-1 bg-gray-100 p-6 overflow-x-auto">
+      <main className="flex-1 bg-gray-100  overflow-x-auto">
         {children}
       </main>
     </div>
