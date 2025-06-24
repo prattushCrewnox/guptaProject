@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import LoginPage from "./pages/Login"
 import { ProtectedRoute } from "./routes/ProtectedRoute"
 import ManagerDashboard from "./pages/ManagerDashboard"
-import EngineerDashboard from "./pages/EngineerDashboard"
+import EngineerDashboard from "./pages/EngineerDashboard "
 import { useAuthStore } from "./store/authStore"
 
 export default function App() {

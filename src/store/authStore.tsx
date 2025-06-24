@@ -1,10 +1,13 @@
 import {create } from "zustand"
-
 interface User {
   _id: string
   name: string
   email: string
   role: "engineer" | "manager"
+  skills?: string[]            
+  seniority?: "junior" | "mid" | "senior" 
+  maxCapacity?: number         
+  department?: string          
 }
 
 interface AuthStore {

@@ -1,53 +1,59 @@
-import { useForm } from "react-hook-form"
+import { useEffect } from "react"
 import { useAuthStore } from "../store/authStore"
-import { updateEngineerProfile } from "../api/engineer"
+import { fetchEngineerAssignments } from "../api/assignment"
+import { useAssignmentStore } from "../store/assignmentStore"
+import { EditEngineerProfile } from "../components/EditEngineerProfile"
 
-interface FormData {
-  skills: string
-  seniority: string
-}
-
-export const EditEngineerProfile = () => {
+export default function EngineerDashboard() {
   const token = useAuthStore((s) => s.token)
   const user = useAuthStore((s) => s.user)
-  const { register, handleSubmit } = useForm<FormData>()
+  const { assignments, setAssignments } = useAssignmentStore()
 
-  const onSubmit = async (data: FormData) => {
-    if (!token || !user) return
-    try {
-      const body = {
-        skills: data.skills.split(",").map((s) => s.trim()),
-        seniority: data.seniority,
+  useEffect(() => {
+    const fetchAssignments = async () => {
+      if (!token) return
+      try {
+        const res = await fetchEngineerAssignments(token)
+        setAssignments(res)
+      } catch (err) {
+        console.error("Error fetching assignments:", err)
       }
-      await updateEngineerProfile(user._id, body, token)
-      alert("Profile updated!")
-    } catch (err: any) {
-      alert(err.response?.data?.message || "Update failed")
     }
-  }
+
+    fetchAssignments()
+  }, [token])
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="bg-white p-4 mt-6 rounded shadow border"
-    >
-      <h2 className="text-lg font-semibold mb-2">Update Profile</h2>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Welcome, {user?.name}</h1>
 
-      <input
-        {...register("skills")}
-        placeholder="Comma-separated skills (e.g. React, Node.js)"
-        className="border p-2 rounded w-full mb-2"
-      />
-      <select {...register("seniority")} className="border p-2 rounded w-full mb-2">
-        <option value="">Select Seniority</option>
-        <option value="junior">Junior</option>
-        <option value="mid">Mid</option>
-        <option value="senior">Senior</option>
-      </select>
+      <h2 className="text-xl font-semibold mb-2">My Assignments</h2>
 
-      <button className="bg-blue-600 text-white px-4 py-2 rounded">
-        Save Changes
-      </button>
-    </form>
+      {assignments.length === 0 ? (
+        <p>No current assignments.</p>
+      ) : (
+        <div className="grid gap-4">
+          {assignments.map((a) => (
+            <div
+              key={a._id}
+              className="bg-white p-4 rounded shadow border"
+            >
+              <h3 className="font-semibold text-lg">{a.projectId.name}</h3>
+              <p className="text-sm text-gray-600">
+                Role: {a.role} | Status: {a.projectId.status}
+              </p>
+              <p className="text-sm text-gray-600">
+                {new Date(a.startDate).toLocaleDateString()} -{" "}
+                {new Date(a.endDate).toLocaleDateString()}
+              </p>
+              <p className="text-sm text-gray-600">
+                Allocation: {a.allocationPercentage}%
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+       <EditEngineerProfile />
+    </div>
   )
 }
