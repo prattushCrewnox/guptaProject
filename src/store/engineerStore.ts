@@ -28,3 +28,18 @@ export const useEngineerStore = create<EngineerState>((set) => ({
   setUtilizationData: (data) => set({ utilizationData: data }),
   setLoading: (value) => set({ loading: value }),
 }))
+
+interface Engineer {
+  _id: string
+  name: string
+}
+
+interface EngineerListState {
+  engineers: Engineer[]
+  setEngineers: (engs: Engineer[]) => void
+}
+
+export const useEngineerListStore = create<EngineerListState>((set) => ({
+  engineers: [],
+  setEngineers: (engs) => set({ engineers: engs }),
+}))
