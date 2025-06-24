@@ -1,35 +1,46 @@
 import { useEffect } from "react"
 import { useAuthStore } from "../store/authStore"
 import { getUtilizationAnalytics } from "../api/analytics"
+import { fetchAllEngineers } from "../api/engineer"
+import { fetchAllProjects } from "../api/project"
 import { useEngineerStore } from "../store/engineerStore"
+import { useEngineerListStore } from "../store/engineerStore"
+import { useProjectStore } from "../store/projectStore"
+import { CreateAssignmentForm } from "../components/CreateAssignmentForm"
 import { CapacityBar } from "../components/CapacityBar"
 
 export default function ManagerDashboard() {
   const token = useAuthStore((s) => s.token)
   const { utilizationData, setUtilizationData, loading, setLoading } =
     useEngineerStore()
+  const setEngineers = useEngineerListStore((s) => s.setEngineers)
+  const setProjects = useProjectStore((s) => s.setProjects)
 
   useEffect(() => {
-    const fetchUtilization = async () => {
+    const fetchAll = async () => {
       if (!token) return
-      try {
-        setLoading(true)
-        const res = await getUtilizationAnalytics(token)
-        setUtilizationData(res.engineerUtilization)
-      } catch (err) {
-        console.error("Error fetching utilization:", err)
-      } finally {
-        setLoading(false)
-      }
+      setLoading(true)
+      const [util, engs, projs] = await Promise.all([
+        getUtilizationAnalytics(token),
+        fetchAllEngineers(token),
+        fetchAllProjects(token),
+      ])
+      setUtilizationData(util.engineerUtilization)
+      setEngineers(engs)
+      setProjects(projs)
+      setLoading(false)
     }
 
-    fetchUtilization()
+    fetchAll()
   }, [token])
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Team Overview</h1>
+    <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-bold">Manager Dashboard</h1>
 
+      <CreateAssignmentForm />
+
+      <h2 className="text-xl font-semibold">Engineer Utilization</h2>
       {loading ? (
         <p>Loading...</p>
       ) : (

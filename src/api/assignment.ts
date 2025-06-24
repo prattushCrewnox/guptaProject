@@ -14,3 +14,10 @@ export const createAssignment = async (data: any, token: string) => {
   })
   return res.data
 }
+
+export const fetchEngineerAssignments = async (token: string) => {
+  const res = await axios.get(baseURL+"/getAllAssignment", {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return res.data
+}
