@@ -1,38 +1,46 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import LoginPage from "./pages/Login"
-import SignupPage from "./pages/Signup"
-import { ProtectedRoute } from "./routes/ProtectedRoute"
-import ManagerDashboard from "./pages/ManagerDashboard"
-import EngineerDashboard from "./pages/EngineerDashboard"
-import AnalyticsDashboard from "./pages/AnalyticsDashboard"
-import { Layout } from "./components/Layout"
-import { useAuthStore } from "./store/authStore"
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import LoginPage from "./pages/Login";
+import SignupPage from "./pages/Signup";
+import { ProtectedRoute } from "./routes/ProtectedRoute";
+import ManagerDashboard from "./pages/ManagerDashboard";
+import EngineerDashboard from "./pages/EngineerDashboard";
+import AnalyticsDashboard from "./pages/AnalyticsDashboard";
+import { Layout } from "./components/Layout";
+import { useAuthStore } from "./store/authStore";
 
-function DashboardRouter() {
-  const user = useAuthStore((s) => s.user)
-  return user?.role === "manager" ? <ManagerDashboard /> : <EngineerDashboard />
-}
+function App() {
+  const { user, loadUserFromToken, isLoading } = useAuthStore();
 
-export default function App() {
+  useEffect(() => {
+    loadUserFromToken();
+  }, [loadUserFromToken]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-xl font-semibold text-gray-700">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
+        <Route path="/signup" element={!user ? <SignupPage /> : <Navigate to="/dashboard" />} />
 
-      
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
               <Layout>
-                <DashboardRouter />
+                {user?.role === "manager" ? <ManagerDashboard /> : <EngineerDashboard />}
               </Layout>
             </ProtectedRoute>
           }
         />
 
-        
         <Route
           path="/analytics"
           element={
@@ -44,9 +52,11 @@ export default function App() {
           }
         />
 
-      
         <Route path="*" element={<div className="p-6 text-red-500 text-xl">404 - Page Not Found</div>} />
       </Routes>
     </Router>
-  )
+  );
 }
+
+export default App;
+

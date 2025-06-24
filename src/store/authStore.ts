@@ -14,43 +14,46 @@ interface User {
 }
 
 interface AuthStore {
-  user: User | null
-  token: string | null
-  setUser: (user: User, token: string) => void
-  logout: () => void
-  loadUserFromToken: () => Promise<void> // ✅ Add this method
+  user: User | null;
+  token: string | null;
+  isLoading: boolean;
+  setUser: (user: User, token: string) => void;
+  logout: () => void;
+  loadUserFromToken: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   token: null,
+  isLoading: true,
 
   setUser: (user, token) => {
-    localStorage.setItem("token", token)
-    set({ user, token })
+    localStorage.setItem("token", token);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    set({ user, token, isLoading: false });
   },
 
   logout: () => {
-    localStorage.removeItem("token")
-    set({ user: null, token: null })
+    localStorage.removeItem("token");
+    delete axios.defaults.headers.common['Authorization'];
+    set({ user: null, token: null, isLoading: false });
   },
 
   loadUserFromToken: async () => {
-    const token = localStorage.getItem("token")
-    if (!token) return
+    const token = localStorage.getItem("token");
+    if (!token) {
+      set({ isLoading: false });
+      return;
+    }
 
     try {
-      const res = await axios.get(baseURL+"/profile", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      set({ user: res.data.user, token })
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const res = await axios.get(`${baseURL}/profile`);
+      set({ user: res.data, token, isLoading: false });
     } catch (err) {
-      console.error("Failed to load user:", err)
-      localStorage.removeItem("token")
-      set({ user: null, token: null })
+      console.error("Failed to load user:", err);
+      localStorage.removeItem("token");
+      set({ user: null, token: null, isLoading: false });
     }
   },
 }))
