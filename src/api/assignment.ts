@@ -21,3 +21,13 @@ export const fetchEngineerAssignments = async (token: string) => {
   })
   return res.data
 }
+
+export const fetchEngineerTimeline = async (id: string, token: string) => {
+  const res = await axios.get(
+    `${baseURL}/${id}/timeline`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  )
+  return res.data
+}

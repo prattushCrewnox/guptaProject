@@ -1,6 +1,7 @@
 import {useForm} from "react-hook-form"
 import { loginUser } from "../api/auth"
 import { useAuthStore } from "../store/authStore"
+import { Link, useNavigate } from "react-router"
 
 
 interface LoginForm {
@@ -13,12 +14,14 @@ export default function LoginPage() {
   const { register, handleSubmit } = useForm<LoginForm>()
   const setUser = useAuthStore((s) => s.setUser)
 
+  const navigate = useNavigate()
+
   const onSubmit = async (data: LoginForm) => {
     try {
       const res = await loginUser(data.email, data.password)
       setUser(res.user, res.token)
-      localStorage.setItem("token", res.token)
-      window.location.href = "/dashboard"
+     navigate("/dashboard")
+      
     } catch (err: any) {
       alert(err.response?.data?.message || "Login failed")
     }
@@ -52,6 +55,13 @@ export default function LoginPage() {
           Login
         </button>
       </form>
+      <p className="text-sm mt-4">
+  Don’t have an account?{" "}
+  <Link to="/signup" className="text-blue-600 hover:underline">
+    Sign up here
+  </Link>
+</p>
+
     </div>
   )
 }
